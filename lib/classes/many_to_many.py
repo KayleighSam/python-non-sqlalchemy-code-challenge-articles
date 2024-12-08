@@ -1,38 +1,140 @@
 class Article:
+    # Class variable to store all articles created
+    all_articles = []
+
     def __init__(self, author, magazine, title):
-        self.author = author
-        self.magazine = magazine
-        self.title = title
+        # Validate inputs to ensure they are valid
+        if not isinstance(author, Author) or not isinstance(magazine, Magazine) or not isinstance(title, str) or not (5 <= len(title) <= 50):
+            raise ValueError("Invalid author, magazine, or title")
         
+        # Assign values to instance variables
+        self._author = author
+        self._magazine = magazine
+        self._title = title
+        
+        # Add the article to the global list of articles 
+        Article.all_articles.append(self)
+        author._articles.append(self)
+        magazine._articles.append(self)
+
+  # Property methods to access the attributes
+    @property
+    def title(self):
+        return self._title
+
+    @property
+    def author(self):
+        return self._author
+
+    @property
+    def magazine(self):
+        return self._magazine
+
+    @classmethod
+    def all(cls):
+        return cls.all_articles  # Return the list of all articles
+
+
 class Author:
     def __init__(self, name):
-        self.name = name
+        
+        if not isinstance(name, str) or len(name) == 0:
+            raise ValueError("Name must be a non-empty string")
+        
+        self._name = name
+        self._articles = []     
 
+    # Property method to access the author's name
+    @property
+    def name(self):
+        return self._name
+
+    # Method to retrieve all articles written by the author
     def articles(self):
-        pass
+        return self._articles
 
+    # Method to get all unique magazines the author has written for
     def magazines(self):
-        pass
+        return list(set(article.magazine for article in self._articles))
 
+    # Method to add an article for the author
     def add_article(self, magazine, title):
-        pass
+        return Article(self, magazine, title)  # Create and return a new article
 
+  
     def topic_areas(self):
-        pass
+        topic_areas = {article.magazine.category for article in self._articles}
+        return list(topic_areas) if topic_areas else None
+
 
 class Magazine:
+    _all_magazines = []  # Class-level list to store all Magazine instances
+
     def __init__(self, name, category):
-        self.name = name
-        self.category = category
+        # Validate that the magazine name and category are correct
+        if not isinstance(name, str) or not (2 <= len(name) <= 16):
+            raise ValueError("Magazine name must be a string between 2 and 16 characters")
+        if not isinstance(category, str) or not category:
+            raise ValueError("Category must be a non-empty string")
+        
+        self._name = name
+        self._category = category
+        self._articles = [] 
+        Magazine._all_magazines.append(self)  
+        # Class method to retrieve all magazines
+    @property
+    def name(self):
+        return self._name
 
+    @name.setter
+    def name(self, value):
+        if not isinstance(value, str) or not (2 <= len(value) <= 16):
+            raise ValueError("Magazine name must be between 2 and 16 characters")
+        self._name = value
+
+    @property
+    def category(self):
+        return self._category
+
+    @category.setter
+    def category(self, value):
+        if not value or not isinstance(value, str):
+            raise ValueError("Category must be a non-empty string")
+        self._category = value
+
+        
     def articles(self):
-        pass
+        return self._articles
 
+    # Method to get all unique authors who have contributed to the magazine
     def contributors(self):
-        pass
+        return list({article.author for article in self._articles})  # Unique authors
 
+    # Method to get the titles of all articles in the magazine
     def article_titles(self):
-        pass
+        return [article.title for article in self._articles] if self._articles else None
 
+    # Method to add an article to the magazine
+    def add_article(self, author, title):
+        # Validate author and title
+        if not isinstance(author, Author) or not isinstance(title, str) or not (5 <= len(title) <= 50):
+            raise ValueError("Invalid author or title")
+        
+        # Create and add the article to the magazine
+        article = Article(author, self, title)
+        self._articles.append(article)
+        return article
+
+    # Method to get authors who have contributed more than 2 articles
     def contributing_authors(self):
-        pass
+        author_counts = {}
+        for article in self.articles():
+            author = article.author
+            author_counts[author] = author_counts.get(author, 0) + 1
+
+        # Filter authors with more than 2 articles in this magazine
+        authors_with_multiple_articles = [author for author, count in author_counts.items() if count > 2]
+        return authors_with_multiple_articles if authors_with_multiple_articles else None
+
+
+
