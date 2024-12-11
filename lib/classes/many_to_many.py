@@ -3,7 +3,7 @@ class Article:
     all_articles = []
 
     def __init__(self, author, magazine, title):
-        # Validate inputs to ensure they are valid
+        # Input validation
         if not isinstance(author, Author) or not isinstance(magazine, Magazine) or not isinstance(title, str) or not (5 <= len(title) <= 50):
             raise ValueError("Invalid author, magazine, or title")
         
@@ -125,7 +125,7 @@ class Magazine:
         self._articles.append(article)
         return article
 
-    # Method to get authors who have contributed more than 2 articles
+    #  get authors who have contributed more than 2 articles
     def contributing_authors(self):
         author_counts = {}
         for article in self.articles():
@@ -136,5 +136,39 @@ class Magazine:
         authors_with_multiple_articles = [author for author, count in author_counts.items() if count > 2]
         return authors_with_multiple_articles if authors_with_multiple_articles else None
 
+# Create instances of authors and magazines
+author_1 = Author("Carry Bradshaw")
+author_2 = Author("Nathaniel Hawthorne")
+magazine_1 = Magazine("Vogue", "Fashion")
+magazine_2 = Magazine("AD", "Architecture")
+
+# Create articles
+Article(author_1, magazine_1, "How to wear a tutu with style")
+Article(author_1, magazine_1, "How to be single and happy")
+Article(author_1, magazine_1, "Dating life in NYC")
+Article(author_1, magazine_2, "Carrara Marble is so 2020")
+Article(author_2, magazine_2, "2023 Eccentric Design Trends")
+
+# Print articles written by each author
+print("Articles by each author:")
+for author in [author_1, author_2]:
+    print(f"Author: {author.name}")
+    if author.articles():
+        for article in author.articles():
+            print(f"  - {article.title} (Magazine: {article.magazine.name})")
+    else:
+        print("  No articles written.")
+    print()
+
+# Print articles published in each magazine
+print("Articles in each magazine:")
+for magazine in [magazine_1, magazine_2]:
+    print(f"Magazine: {magazine.name} (Category: {magazine.category})")
+    if magazine.articles():
+        for article in magazine.articles():
+            print(f"  - {article.title} (Author: {article.author.name})")
+    else:
+        print("  No articles published.")
+    print()
 
 
